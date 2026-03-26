@@ -20,10 +20,7 @@ export function Header() {
   const title = getHeaderTitle(location.pathname)
 
   const initials =
-    user?.name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
+    user?.username
       .slice(0, 2)
       .toUpperCase() ?? "?"
 
@@ -42,7 +39,7 @@ export function Header() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="rounded-full">
               <Avatar className="size-8">
-                <AvatarImage src={user?.avatar} alt={user?.name} />
+                <AvatarImage src={user?.avatar} alt={user?.username} />
                 <AvatarFallback>{initials}</AvatarFallback>
               </Avatar>
             </Button>
@@ -50,8 +47,7 @@ export function Header() {
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>
               <div className="flex flex-col">
-                <span>{user?.name}</span>
-                <span className="text-xs font-normal text-muted-foreground">{user?.email}</span>
+                <span>{user?.username}</span>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />

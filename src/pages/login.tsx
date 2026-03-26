@@ -15,9 +15,10 @@ import {
 
 export function LoginPage() {
   const [mode, setMode] = useState<"signin" | "signup">("signin")
+  const [username, setUsername] = useState("")
+  const [fullName, setFullName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [fullName, setFullName] = useState("")
   const [rememberMe, setRememberMe] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
   const { login, signup, isLoading } = useAuth()
@@ -30,20 +31,15 @@ export function LoginPage() {
     setErrorMessage("")
     try {
       if (mode === "signup") {
-        await signup(
-          { email, password, name: fullName },
-          { name: fullName || undefined, rememberMe }
-        )
+        await signup({ fullName, email, password }, { rememberMe })
       } else {
-        await login(email, password, { name: fullName || undefined, rememberMe })
+        await login(username, password, { rememberMe })
       }
       navigate(from, { replace: true })
     } catch (error) {
-      if (error instanceof AuthError) {
-        setErrorMessage(error.message)
-        return
-      }
-      setErrorMessage("Something went wrong. Please try again.")
+      const maybeAuthError = error as unknown as AuthError
+      const message = typeof maybeAuthError?.message === "string" ? maybeAuthError.message : ""
+      setErrorMessage(message || "Something went wrong. Please try again.")
     }
   }
 
@@ -62,30 +58,47 @@ export function LoginPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="fullName">Full name</Label>
-              <Input
-                id="fullName"
-                type="text"
-                placeholder="Jane Doe"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                autoComplete="name"
-                required={mode === "signup"}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                autoComplete="email"
-              />
-            </div>
+            {mode === "signin" ? (
+              <div className="space-y-2">
+                <Label htmlFor="username">Username</Label>
+                <Input
+                  id="username"
+                  type="text"
+                  placeholder="johndeo"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required
+                  autoComplete="username"
+                />
+              </div>
+            ) : (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="fullName">Full Name</Label>
+                  <Input
+                    id="fullName"
+                    type="text"
+                    placeholder="John Doe"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    required
+                    autoComplete="name"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email Id</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="johndeo@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    autoComplete="email"
+                  />
+                </div>
+              </>
+            )}
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <Input
